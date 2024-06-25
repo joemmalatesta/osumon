@@ -7,6 +7,7 @@
 	let plays;
 	$: plays = form?.plays;
 	$: userInfo = form?.userInfo;
+	$: console.log(userInfo)
 
 	function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -34,12 +35,12 @@ const options: any = { day: 'numeric', month: 'long', year: 'numeric' };
 					<div class="flex items-center gap-2 h-fit">
 						<div class="flex items-end">
 							<p class="text-sm">#</p>
-							<p class="text-xl">{userInfo.rank}</p>
+							<p class="text-xl">{userInfo.global_rank}</p>
 						</div>
 						<img
 							class="w-8"
-							src="https://flagsapi.com/{userInfo.countryCode}/flat/64.png"
-							alt="{userInfo.countryCode} flag"
+							src="https://flagsapi.com/{userInfo.country_code}/flat/64.png"
+							alt="{userInfo.country_code} flag"
 						/>
 					</div>
 				</div>
@@ -47,12 +48,12 @@ const options: any = { day: 'numeric', month: 'long', year: 'numeric' };
 				<div class="h-2/5 mx-10 flex justify-center flex-col drop-shadow">
 					<img
 						class="rounded-t-xl aspect-video border-4 border-b-0 border-gray-300/80"
-						src={userInfo.avatar}
+						src={userInfo.avatar_url}
 						alt={userInfo.username}
 					/>
 					<div class="h-5 w-full bg-gray-300/80 items-center rounded-b-md flex justify-between">
-						<p class="text-xs px-2 mx-1">{userInfo.isSupporter ? "♥ " : ""}{Math.floor(userInfo.totalPp)}pp {playstyles.length > 0 ? `| ${playstyles}` : ""} </p>
-						<p class="text-xs px-2 mx-1">Since {new Date(userInfo.joinDate).toLocaleDateString('en-US', options)}</p>
+						<p class="text-xs px-2 mx-1">{userInfo.isSupporter ? "♥ " : ""}{Math.floor(userInfo.pp)}pp {playstyles.length > 0 ? `| ${playstyles}` : ""} </p>
+						<p class="text-xs px-2 mx-1">Since {new Date(userInfo.join_date).toLocaleDateString('en-US', options)}</p>
 					</div>
 				</div>
 				<!-- Top plays -->
