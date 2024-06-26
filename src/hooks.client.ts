@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/sveltekit';
 Sentry.init({
 	dsn: 'https://1f663683ea7d5851ccb2f160e094bb09@o4506044970565632.ingest.us.sentry.io/4507472273145856',
 	tracesSampleRate: 1.0,
+	// tracePropagationTargets: ['localhost', "https://osumon.vercel.app/"],
 
 	// This sets the sample rate to be 10%. You may want this to be 100% while
 	// in development and sample at a lower rate in production
@@ -19,9 +20,11 @@ Sentry.init({
 		Sentry.feedbackIntegration({
 			// Additional SDK configuration goes in here, for example:
 			colorScheme: 'light'
-		})
-	]
+		}),
+		// Sentry.browserTracingIntegration(),
+	],
 });
 
 // If you have a custom error handler, pass it to `handleErrorWithSentry`
 export const handleError = handleErrorWithSentry();
+

@@ -1,5 +1,6 @@
 import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { OSU_CLIENT_SECRET, OSU_CLIENT_ID } from '$env/static/private';
+import { type sentrySvelteKit, startSpan } from '@sentry/sveltekit';
 
 // Load token in load function
 export const load: ServerLoad = async ({ params }) => {
@@ -22,7 +23,7 @@ export const load: ServerLoad = async ({ params }) => {
 		userInfo[property] = await getUserInfo(username, property, token);
 	}
 	const plays = await getTopPlays(token, userInfo['id'])
-	const { strength, weakness } = getStrengthAndWeakness(plays);
+	const { strength, weakness } = startSpan({name: 'get strengths and weaknesses', op: "function"}, () => getStrengthAndWeakness(plays));
 	return {
 		plays,
 		userInfo,
