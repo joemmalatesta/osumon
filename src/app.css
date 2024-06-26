@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.theme-electric{
+    --color-primary: 234 179 8;
+    --color-secondary: 	250 204 21;
+    --color-detail: 253 224 71;
+
+}
+
+.theme-dark{
+    --color-primary: 39 39 42;
+    --color-secondary: 63 63 70;
+    --color-detail: 82 82 91;
+}
+
+.theme-fire{
+    --color-primary: 220 38 38;
+    --color-secondary: 239 68 68;
+    --color-detail: 248 113 113;
+}
+
+.theme-water{
+    --color-primary: 2 132 199;
+    --color-secondary: 14 165 233;
+    --color-detail: 56 189 248;
+}
+
+.theme-psychic{
+    --color-primary: 124 58 237;
+    --color-secondary: 139 92 246;
+    --color-detail: 167 139 250;
+}
+
+.theme-grass{
+    --color-primary: 22 163 74;
+    --color-secondary: 34 197 94;
+    --color-detail: 74 222 128;
+}

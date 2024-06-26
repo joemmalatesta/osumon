@@ -7,3 +7,5 @@ export const load: ServerLoad = async () => {
 	var version = versions[Math.floor(Math.random() * versions.length)];
 	redirect(303, version)
 }
+
+
