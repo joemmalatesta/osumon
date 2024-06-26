@@ -1,4 +1,4 @@
-# Second best here
+# Worst page here
 
-- Load profile info all at once
-- Since we need to get each map info, still keep them in parallel
+- Load everything from the account separate
+- Keep waterfall in series

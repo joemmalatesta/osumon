@@ -1,67 +1,9 @@
-import type { Actions, ServerLoad } from '@sveltejs/kit';
-import { OSU_CLIENT_SECRET, OSU_CLIENT_ID } from '$env/static/private';
+import { redirect, type Actions, type ServerLoad } from '@sveltejs/kit';
 
-const baseUrl = 'https://osu.ppy.sh/api/v2/'
-
-
-let token: any
 
 // Load token in load function
 export const load: ServerLoad = async () => {
-	const url = new URL(
-		"https://osu.ppy.sh/oauth/token"
-	);
-		
-	let body = `client_id=${OSU_CLIENT_ID}&client_secret=${OSU_CLIENT_SECRET}&grant_type=client_credentials&scope=public`;
-	
-	const response  = await fetch(url, {
-		method: "POST",
-		headers: {
-			"Accept": "application/json",
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-		body: body,
-	})
-	token = await response.json()
-	token = token['access_token']
+	const versions: string[] = ['v1', 'v2', 'v3']
+	var version = versions[Math.floor(Math.random() * versions.length)];
+	redirect(303, version)
 }
-
-
-
-export const actions = {
-	default: async ( {request}) => {
-		const formData = await request.formData()
-		const username = formData.get('username') as string
-		let userInfo = await getUserId(username)                                                      
-		const response  = await fetch(`https://osu.ppy.sh/api/v2/users/${userInfo.userId}/scores/best`,{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				"Accept": "application/json",
-				"Authorization": `Bearer ${token}`
-			},
-		}
-		)
-		// console.log(await response.json())
-		const plays = await response.json()
-		return {
-			plays, userInfo
-		}
-	},
-} satisfies Actions;
-
-
-
-// Helper to get osu user Id
-async function getUserId(username: string ) {
-	const response  = await fetch(`https://osu.ppy.sh/api/v2/users/${username}/osu`,{
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-			"Accept": "application/json",
-			"Authorization": `Bearer ${token}`
-		},
-	})
-	let userData = await response.json()
-	return userData['id']
-} 
