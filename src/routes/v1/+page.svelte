@@ -1,15 +1,14 @@
 <script lang="ts">
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data
 	export let form;
 	let userInfo;
 	let plays;
 	$: plays = form?.plays;
 	$: userInfo = form?.userInfo;
 
-	function capitalizeFirstLetter(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+	function capitalizeFirstLetter(word: string) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
 }
 let playstyles: string[];
 $: if (userInfo) {
