@@ -46,6 +46,7 @@ export const load: ServerLoad = async ({ params }) => {
 			weakness
 		};
 	} catch (error) {
+		console.log('sending error to frontend')
 		return { error: 'something wrong' };
 	}
 };
@@ -58,20 +59,24 @@ export const load: ServerLoad = async ({ params }) => {
 // Get user info one at a time...
 async function getUserInfo(username: string, property: string, token: string) {
 	console.log('getting property ' + property);
-	const response = await fetch(`https://osu.ppy.sh/api/v2/users/${username}/osu`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Accept: 'application/json',
-			Authorization: `Bearer ${token}`
+	try{
+
+		const response = await fetch(`https://osu.ppy.sh/api/v2/users/${username}/osu`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		});
+		let userData = await response.json();
+		// Need to add stats bit for some props
+		if (property == 'pp' || property == 'global_rank') {
+			return userData['statistics'][property];
 		}
-	});
-	let userData = await response.json();
-	// Need to add stats bit for some props
-	if (property == 'pp' || property == 'global_rank') {
-		return userData['statistics'][property];
-	}
-	return userData[property] ?? [];
+		return userData[property] ?? [];
+	}catch(error) {
+		throw new Error('error moment')}
 }
 
 function getStrengthAndWeakness(plays: any[]) {

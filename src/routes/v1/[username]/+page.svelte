@@ -4,7 +4,8 @@
 	export let data;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	$: playInfo = data?.topPlayInfo!.slice(0,3)
+	let playInfo: any[]
+	$: if (data.topPlayInfo) {playInfo = data?.topPlayInfo?.slice(0,3)}
 	$: favMapper = data?.favoriteMapper
 	$: if (data.error) {
 		alert('User not found')

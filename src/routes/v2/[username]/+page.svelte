@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 
 	export let data;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	$: playInfo = data?.topPlayInfo!.slice(0,3)
+	let playInfo: any[]
+	$: if (data.topPlayInfo) {playInfo = data?.topPlayInfo?.slice(0,3)}
 	$: favMapper = data?.favoriteMapper
-	$: if (data.error) {
+	$: if (data.error && browser) {
 		alert('User not found')
 		goto('/v2')
 	}

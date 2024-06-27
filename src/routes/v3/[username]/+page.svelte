@@ -1,14 +1,15 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { setContext } from 'svelte';
 
 
 	export let data;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	$: playInfo = data?.topPlayInfo!.slice(0,3)
+	let playInfo: any[]
+	$: if (data.topPlayInfo) {playInfo = data?.topPlayInfo?.slice(0,3)}
 	$: favMapper = data?.favoriteMapper
-	$: if (data.error) {
+	$: if (data.error && browser) {
 		alert('User not found')
 		goto('/v3')
 	}
@@ -108,7 +109,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 								{play['beatmap']['version']} - {play['beatmapset']['artist']}
 							</p>
 							<p class="opacity-60 text-xs">
-								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[index]['max_combo']}x, {(
+								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{ playInfo[index]['max_combo']}x, {(
 									play['accuracy'] * 100
 								).toFixed(2)}%
 							</p>
