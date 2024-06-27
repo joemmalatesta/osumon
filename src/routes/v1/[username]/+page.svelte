@@ -32,10 +32,10 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 {#if userInfo && plays}
 	<main class="w-screen h-screen justify-center items-center flex flex-col sm:gap-5 overflow-hidden theme-{selectedTheme} ">
 		<div class="flex flex-col items-center">
-			<h1 class="text-5xl font-semibold">osumon!</h1>
+			<div class="text-5xl font-semibold flex">osumon!</div>
 			<a
 				class="text-sm underline-offset-2 underline hover:underline-offset-4 transition-all"
-				href="/v1">Try another</a
+				href="/v1">Reset</a
 			>
 			<div class="flex gap-2">
 			{#each possibleThemes as theme}
@@ -103,10 +103,10 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 								<p class="text-lg font-semibold">{Math.round(play['pp'])}pp</p>
 							</div>
 							<!-- Need to get possible combo... Maybe a separate call just for this. -->
-							<p class="opacity-60 text-xs sm:text-sm xl:text-base lg:text-base">
+							<p class="opacity-60 text-xs 2xl:text-sm">
 								{play['beatmap']['version']} - {play['beatmapset']['artist']}
 							</p>
-							<p class="opacity-60 text-xs">
+							<p class="opacity-60 text-xs 2xl:text-sm">
 								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[index]['max_combo']}x, {(
 									play['accuracy'] * 100
 								).toFixed(2)}%

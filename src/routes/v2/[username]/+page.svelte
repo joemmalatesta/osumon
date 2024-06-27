@@ -4,47 +4,59 @@
 	export let data;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	let playInfo: any[]
-	$: if (data.topPlayInfo) {playInfo = data?.topPlayInfo?.slice(0,3)}
-	$: favMapper = data?.favoriteMapper
+	let playInfo: any[];
+	$: if (data.topPlayInfo) {
+		playInfo = data?.topPlayInfo?.slice(0, 3);
+	}
+	$: favMapper = data?.favoriteMapper;
 	$: if (data.error) {
-		alert('User not found')
-		goto('/v2')
+		alert('User not found');
+		goto('/v2');
 	}
 
 	function capitalizeFirstLetter(string: string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
-let playstyles: string[];
-$: if (userInfo) {
-	playstyles = userInfo.playstyle.map((style: string) => `${capitalizeFirstLetter(style)}`)
-}
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+	let playstyles: string[];
+	$: if (userInfo) {
+		playstyles = userInfo.playstyle.map((style: string) => `${capitalizeFirstLetter(style)}`);
+	}
 
-const options: any = { day: 'numeric', month: 'long', year: 'numeric' };
-let dataSubmitted: boolean = false
+	const options: any = { day: 'numeric', month: 'long', year: 'numeric' };
+	let dataSubmitted: boolean = false;
 
-
-let selectedTheme: string = "electric"
-let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
-
+	let selectedTheme: string = 'electric';
+	let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass'];
 </script>
 
 {#if userInfo && plays}
-	<main class="w-screen h-screen justify-center items-center flex flex-col sm:gap-5 overflow-hidden theme-{selectedTheme} ">
+	<main
+		class="w-screen h-screen justify-center items-center flex flex-col sm:gap-5 overflow-hidden theme-{selectedTheme} "
+	>
 		<div class="flex flex-col items-center">
 			<h1 class="text-5xl font-semibold">osumon!</h1>
 			<a
 				class="text-sm underline-offset-2 underline hover:underline-offset-4 transition-all"
-				href="/v2">Try another</a
+				href="/v2">Reset</a
 			>
 			<div class="flex gap-2">
-			{#each possibleThemes as theme}
-				<button on:click={() => selectedTheme=theme}><img class="w-7 rounded-full {selectedTheme == theme? "ring ring-neutral-600/40 ring-offset-1": ""}" src="/{theme}.png" alt=""></button>
-			{/each}
-		</div>
+				{#each possibleThemes as theme}
+					<button on:click={() => (selectedTheme = theme)}
+						><img
+							class="w-7 rounded-full {selectedTheme == theme
+								? 'ring ring-neutral-600/40 ring-offset-1'
+								: ''}"
+							src="/{theme}.png"
+							alt=""
+						/></button
+					>
+				{/each}
+			</div>
 		</div>
 		<section
-			class="-translate-y-7 sm:translate-y-0 {selectedTheme == 'dark' ? "text-white": ""} xl:w-1/3 sm:scale-100 scale-[85%]  relative h-5/6 bg-gradient-to-br from-detail/60 to-primary/80 ring-8 ring-yellow-400/80 rounded-xl drop-shadow-xl"
+			class="-translate-y-7 sm:translate-y-0 {selectedTheme == 'dark'
+				? 'text-white'
+				: ''} xl:w-1/3 sm:scale-100 scale-[85%] relative h-5/6 bg-gradient-to-br from-detail/60 to-primary/80 ring-8 ring-yellow-400/80 rounded-xl drop-shadow-xl"
 		>
 			<div
 				class="text-sm flex justify-center items-center absolute w-20 h-5 bg-gradient-to-r from-gray-300/70 to-gray-300 rounded-tl-xl rounded-br-xl text-black"
@@ -74,9 +86,11 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 						src={userInfo.avatar_url}
 						alt={userInfo.username}
 					/>
-					<div class="h-5 w-full bg-gray-200/80 text-black items-center rounded-b-md flex justify-between">
+					<div
+						class="h-5 w-full bg-gray-200/80 text-black items-center rounded-b-md flex justify-between"
+					>
 						<p class="text-xs px-2 mx-1">
-							{userInfo.isSupporter ? '♥ ' : ''}{Math.floor(userInfo.pp)}pp {playstyles.length > 0
+							{userInfo.is_supporter ? '♥ ' : ''}{Math.floor(userInfo.pp)}pp {playstyles.length > 0
 								? `| ${playstyles}`
 								: ''}
 						</p>
@@ -103,13 +117,13 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 								<p class="text-lg font-semibold">{Math.round(play['pp'])}pp</p>
 							</div>
 							<!-- Need to get possible combo... Maybe a separate call just for this. -->
-							<p class="opacity-60 text-xs sm:text-sm xl:text-base lg:text-base">
+							<p class="opacity-60 text-xs 2xl:text-sm">
 								{play['beatmap']['version']} - {play['beatmapset']['artist']}
 							</p>
-							<p class="opacity-60 text-xs">
-								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[index]['max_combo']}x, {(
-									play['accuracy'] * 100
-								).toFixed(2)}%
+							<p class="opacity-60 text-xs 2xl:text-sm">
+								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[
+									index
+								]['max_combo']}x, {(play['accuracy'] * 100).toFixed(2)}%
 							</p>
 						</div>
 					{/each}
@@ -123,7 +137,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 						<!-- Mod most in top 100 -->
 						<div class="flex gap-0.5 items-center">
 							<p class=" opacity-75">Strength</p>
-							<img class="w-6 h-4 lg:w-9 lg:h-6 " src="/{data?.strength}.png" alt="" />
+							<img class="w-6 h-4 lg:w-9 lg:h-6" src="/{data?.strength}.png" alt="" />
 						</div>
 						<!-- Mod Least in top 100 -->
 						<div class="flex gap-0.5 items-center">
@@ -137,5 +151,3 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 		</section>
 	</main>
 {/if}
-
-
