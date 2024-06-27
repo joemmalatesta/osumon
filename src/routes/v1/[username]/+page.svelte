@@ -1,19 +1,12 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 
-
-	export let data;
+	export let data../../v2 copy/[username]/$types.js;
 	let userInfo;
 	let plays;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
 	$: console.log(userInfo)
 	$: console.log(data)
-	if (data.error){
-		alert('User not found')
-		goto('/v2')
-	}
-
 
 	function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -36,6 +29,10 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 	<main class="w-screen h-screen justify-center items-center flex flex-col gap-5 overflow-hidden theme-{selectedTheme} ">
 		<div class="flex flex-col items-center">
 			<h1 class="text-5xl font-semibold">osumon!</h1>
+			<!-- <a
+				class="text-sm underline-offset-2 underline hover:underline-offset-4 transition-all"
+				href="/v3">Try another</a
+			> -->
 			<div class="flex gap-2">
 			{#each possibleThemes as theme}
 				<button on:click={() => selectedTheme=theme}><img class="w-7 rounded-full {selectedTheme == theme? "ring ring-neutral-600/40 ring-offset-1": ""}" src="/{theme}.png" alt=""></button>

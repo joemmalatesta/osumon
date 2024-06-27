@@ -1,9 +1,10 @@
-import type { Actions, ServerLoad } from '@sveltejs/kit';
+import { redirect, type Actions, type ServerLoad } from '@sveltejs/kit';
 import { OSU_CLIENT_SECRET, OSU_CLIENT_ID } from '$env/static/private';
 
 // Load token in load function
 export const load: ServerLoad = async ({ params }) => {
 	// Need to be done first, before any subsequent calls
+	try{
 	const token = await getAuthToken();
 	const username = params.username as string;
 	let userInfo: any = await getUserInfo(username, token);
@@ -14,7 +15,12 @@ export const load: ServerLoad = async ({ params }) => {
 		userInfo,
 		strength,
 		weakness
-	};
+	};}
+	// If name doesn't exist
+	catch (error){
+		console.log('user not found')
+		return {error: 'user not found'}
+	}
 };
 // Get user info, all separate
 
