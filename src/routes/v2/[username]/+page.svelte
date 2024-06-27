@@ -1,19 +1,9 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-
-
 	export let data;
-	let userInfo;
-	let plays;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	$: console.log(userInfo)
-	$: console.log(data)
-	if (data.error){
-		alert('User not found')
-		goto('/v2')
-	}
-
+	$: playInfo = data?.topPlayInfo.slice(0,3)
+	$: favMapper = data?.favoriteMapper
 
 	function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -36,6 +26,10 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 	<main class="w-screen h-screen justify-center items-center flex flex-col gap-5 overflow-hidden theme-{selectedTheme} ">
 		<div class="flex flex-col items-center">
 			<h1 class="text-5xl font-semibold">osumon!</h1>
+			<!-- <a
+				class="text-sm underline-offset-2 underline hover:underline-offset-4 transition-all"
+				href="/v3">Try another</a
+			> -->
 			<div class="flex gap-2">
 			{#each possibleThemes as theme}
 				<button on:click={() => selectedTheme=theme}><img class="w-7 rounded-full {selectedTheme == theme? "ring ring-neutral-600/40 ring-offset-1": ""}" src="/{theme}.png" alt=""></button>
@@ -86,7 +80,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 				</div>
 				<!-- Top plays -->
 				<div class="h-1/3 flex flex-col px-10 mt-7 gap-3">
-					{#each plays.slice(0, 3) as play}
+					{#each plays.slice(0, 3) as play, index}
 						<div class="flex-col flex w-full">
 							<div class="flex items-start justify-between">
 								<div class="flex items-center">
@@ -106,7 +100,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 								{play['beatmap']['version']} - {play['beatmapset']['artist']}
 							</p>
 							<p class="opacity-60 text-xs">
-								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x, {(
+								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[index]['max_combo']}x, {(
 									play['accuracy'] * 100
 								).toFixed(2)}%
 							</p>
@@ -130,6 +124,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 							<img class="w-6 h-4" src="/{data?.weakness}.png" alt="" />
 						</div>
 					</div>
+					<p class="italic text-sm">{favMapper} farmer</p>
 				</div>
 			</flex>
 		</section>

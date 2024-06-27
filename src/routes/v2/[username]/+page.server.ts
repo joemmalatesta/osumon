@@ -1,57 +1,39 @@
-import { redirect, type Actions, type ServerLoad } from '@sveltejs/kit';
+import type { Actions, ServerLoad } from '@sveltejs/kit';
 import { OSU_CLIENT_SECRET, OSU_CLIENT_ID } from '$env/static/private';
+import { type sentrySvelteKit, startSpan } from '@sentry/sveltekit';
 
 // Load token in load function
 export const load: ServerLoad = async ({ params }) => {
 	// Need to be done first, before any subsequent calls
-	try{
 	const token = await getAuthToken();
 	const username = params.username as string;
 	let userInfo: any = await getUserInfo(username, token);
-	const plays = await getTopPlays(token, userInfo.id)
-	const { strength, weakness } = getStrengthAndWeakness(plays);
+	const plays = await getTopPlays(token, userInfo['id'])
+
+	// Get deeper info on certain maps
+	let topPlayInfo = []
+	for (let i = 0; i < 20; i++) {
+		topPlayInfo.push(await getMapInfo(token, plays[i]['beatmap']['id']))
+	}
+
+
+	const favoriteMapper = getFavoriteMapper(plays)
+
+	const { strength, weakness } = startSpan({name: 'get strengths and weaknesses', op: "function"}, () => getStrengthAndWeakness(plays));
 	return {
 		plays,
+		topPlayInfo,
+		favoriteMapper,
 		userInfo,
 		strength,
 		weakness
-	};}
-	// If name doesn't exist
-	catch (error){
-		console.log('user not found')
-		return {error: 'user not found'}
-	}
+	};
 };
 // Get user info, all separate
 
 // Get play Id's
 
 // Run play Id's one at a time, waterfall style
-
-// Get user info one at a time...
-// Helper to get osu user Id
-async function getUserInfo(username: string, token: string) {
-	const response = await fetch(`https://osu.ppy.sh/api/v2/users/${username}/osu`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Accept: 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	});
-	let userData = await response.json();
-	return {
-		id: userData['id'],
-		avatar_url: userData['avatar_url'],
-		country_code: userData['country_code'],
-		is_supporter: userData['is_supporter'],
-		username: userData['username'],
-		global_rank: userData['statistics']['global_rank'],
-		playstyle: userData['playstyle'] ?? [],
-		pp: userData['statistics']['pp'],
-		join_date: userData['join_date']
-	};
-}
 
 function getStrengthAndWeakness(plays: any[]) {
 	// NC == DT
@@ -93,9 +75,6 @@ function getStrengthAndWeakness(plays: any[]) {
 	};
 }
 
-const sleep = (milliseconds: number) => {
-	return new Promise((resolve) => setTimeout(resolve, milliseconds));
-};
 
 async function getAuthToken() {
 	const url = new URL('https://osu.ppy.sh/oauth/token');
@@ -128,4 +107,70 @@ async function getTopPlays(token: string, userId: string){
 		}
 	);
 	return await response.json();
+}
+
+
+async function getMapInfo(token: string, mapId: string) {
+	const response = await fetch(
+		`https://osu.ppy.sh/api/v2/beatmaps/${mapId}`,
+		{
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		}
+	);
+	return await response.json();
+}
+
+
+function getFavoriteMapper(plays: any[]) {
+	const frequencyMap: { [key: string]: number } = {};
+
+    for (const play of plays) {
+		let mapper = play['beatmapset']['creator']
+        if (frequencyMap[mapper]) {
+            frequencyMap[mapper]++;
+        } else {
+            frequencyMap[mapper] = 1;
+        }
+    }
+
+    let mostFrequentStr = "";
+    let maxCount = 0;
+
+    for (const str in frequencyMap) {
+        if (frequencyMap[str] > maxCount) {
+            maxCount = frequencyMap[str];
+            mostFrequentStr = str;
+        }
+    }
+	console.log(mostFrequentStr)
+    return mostFrequentStr;
+}
+
+
+async function getUserInfo(username: string, token: string) {
+	const response = await fetch(`https://osu.ppy.sh/api/v2/users/${username}/osu`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			Accept: 'application/json',
+			Authorization: `Bearer ${token}`
+		}
+	});
+	let userData = await response.json();
+	return {
+		id: userData['id'],
+		avatar_url: userData['avatar_url'],
+		country_code: userData['country_code'],
+		is_supporter: userData['is_supporter'],
+		username: userData['username'],
+		global_rank: userData['statistics']['global_rank'],
+		playstyle: userData['playstyle'] ?? [],
+		pp: userData['statistics']['pp'],
+		join_date: userData['join_date']
+	};
 }

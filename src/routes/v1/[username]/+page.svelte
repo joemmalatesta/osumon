@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	export let data../../v2 copy/[username]/$types.js;
+	export let data
 	let userInfo;
 	let plays;
 	$: plays = data?.plays;
