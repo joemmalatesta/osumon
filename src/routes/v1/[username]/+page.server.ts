@@ -16,7 +16,6 @@ export const load: ServerLoad = async ({ params }) => {
 	for (let i = 0; i < 20; i++) {
 		topPlayInfoPromises.push(getMapInfo(token, plays[i]['beatmap']['id']));
 	}
-	const topPlayInfo = await Promise.all(topPlayInfoPromises);
 
 
 
@@ -25,7 +24,7 @@ export const load: ServerLoad = async ({ params }) => {
 	const { strength, weakness } = startSpan({name: 'get strengths and weaknesses', op: "function"}, () => getStrengthAndWeakness(plays));
 	return {
 		plays,
-		topPlayInfo,
+		topPlayInfo: await Promise.all(topPlayInfoPromises),
 		favoriteMapper,
 		userInfo,
 		strength,

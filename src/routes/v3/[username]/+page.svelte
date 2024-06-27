@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-
 
 	export let data;
 	$: plays = data?.plays;
@@ -9,7 +7,7 @@
 	let playInfo: any[]
 	$: if (data.topPlayInfo) {playInfo = data?.topPlayInfo?.slice(0,3)}
 	$: favMapper = data?.favoriteMapper
-	$: if (data.error && browser) {
+	$: if (data.error) {
 		alert('User not found')
 		goto('/v3')
 	}
@@ -32,13 +30,13 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 </script>
 
 {#if userInfo && plays}
-	<main class="w-screen h-screen justify-center items-center flex flex-col gap-5 overflow-hidden theme-{selectedTheme} ">
+	<main class="w-screen h-screen justify-center items-center flex flex-col sm:gap-5 overflow-hidden theme-{selectedTheme} ">
 		<div class="flex flex-col items-center">
 			<h1 class="text-5xl font-semibold">osumon!</h1>
-			<!-- <a
+			<a
 				class="text-sm underline-offset-2 underline hover:underline-offset-4 transition-all"
 				href="/v3">Try another</a
-			> -->
+			>
 			<div class="flex gap-2">
 			{#each possibleThemes as theme}
 				<button on:click={() => selectedTheme=theme}><img class="w-7 rounded-full {selectedTheme == theme? "ring ring-neutral-600/40 ring-offset-1": ""}" src="/{theme}.png" alt=""></button>
@@ -46,7 +44,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 		</div>
 		</div>
 		<section
-			class="{selectedTheme == 'dark' ? "text-white": ""} relative w-1/3 h-5/6 bg-gradient-to-br from-detail/60 to-primary/80 ring-8 ring-yellow-400/80 rounded-xl drop-shadow-xl"
+			class="-translate-y-7 sm:translate-y-0 {selectedTheme == 'dark' ? "text-white": ""} xl:w-1/3 sm:scale-100 scale-[85%]  relative h-5/6 bg-gradient-to-br from-detail/60 to-primary/80 ring-8 ring-yellow-400/80 rounded-xl drop-shadow-xl"
 		>
 			<div
 				class="text-sm flex justify-center items-center absolute w-20 h-5 bg-gradient-to-r from-gray-300/70 to-gray-300 rounded-tl-xl rounded-br-xl text-black"
@@ -70,7 +68,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 					</div>
 				</div>
 				<!-- Picture -->
-				<div class="h-2/5 mx-10 flex justify-center flex-col drop-shadow">
+				<div class="h-2/5 mx-10 flex justify-center flex-col drop-shadow scale-110 sm:scale-100">
 					<img
 						class="rounded-t-xl aspect-video border-4 border-b-0 border-gray-200/80"
 						src={userInfo.avatar_url}
@@ -105,11 +103,11 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 								<p class="text-lg font-semibold">{Math.round(play['pp'])}pp</p>
 							</div>
 							<!-- Need to get possible combo... Maybe a separate call just for this. -->
-							<p class="opacity-60 text-xs">
+							<p class="opacity-60 text-xs sm:text-sm xl:text-base lg:text-base">
 								{play['beatmap']['version']} - {play['beatmapset']['artist']}
 							</p>
 							<p class="opacity-60 text-xs">
-								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{ playInfo[index]['max_combo']}x, {(
+								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[index]['max_combo']}x, {(
 									play['accuracy'] * 100
 								).toFixed(2)}%
 							</p>
@@ -120,22 +118,24 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 				<div
 					class="h-[2px] mx-2 bg-gradient-to-r from-detail/60 to-secondary/60 translate-y-2"
 				></div>
-				<div class="flex items-center justify-between px-10 mt-5">
+				<div class="flex items-center justify-between px-10 mt-5 xl:text-lg text-sm sm:text-base">
 					<div class="flex gap-3">
 						<!-- Mod most in top 100 -->
 						<div class="flex gap-0.5 items-center">
-							<p class="text-sm opacity-75">Strength</p>
-							<img class="w-6 h-4" src="/{data?.strength}.png" alt="" />
+							<p class=" opacity-75">Strength</p>
+							<img class="w-6 h-4 lg:w-9 lg:h-6 " src="/{data?.strength}.png" alt="" />
 						</div>
 						<!-- Mod Least in top 100 -->
 						<div class="flex gap-0.5 items-center">
-							<p class="text-sm opacity-75">Weakness</p>
-							<img class="w-6 h-4" src="/{data?.weakness}.png" alt="" />
+							<p class=" opacity-75">Weakness</p>
+							<img class="w-6 h-4 lg:w-9 lg:h-6" src="/{data?.weakness}.png" alt="" />
 						</div>
 					</div>
-					<p class="italic text-sm">{favMapper} farmer</p>
+					<p class="italic">{favMapper} farmer</p>
 				</div>
 			</flex>
 		</section>
 	</main>
 {/if}
+
+
