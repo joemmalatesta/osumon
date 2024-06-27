@@ -4,6 +4,7 @@ import { type sentrySvelteKit, startSpan } from '@sentry/sveltekit';
 
 // Load token in load function
 export const load: ServerLoad = async ({ params }) => {
+	try{
 	// Need to be done first, before any subsequent calls
 	const token = await getAuthToken();
 	const username = params.username as string;
@@ -12,6 +13,7 @@ export const load: ServerLoad = async ({ params }) => {
 
 	// Get deeper info on certain maps
 	let topPlayInfo = []
+	// Still making these calls in series
 	for (let i = 0; i < 20; i++) {
 		topPlayInfo.push(await getMapInfo(token, plays[i]['beatmap']['id']))
 	}
@@ -27,7 +29,10 @@ export const load: ServerLoad = async ({ params }) => {
 		userInfo,
 		strength,
 		weakness
-	};
+	};}
+	catch(error) {
+		return { error: 'something wrong'}
+	}
 };
 // Get user info, all separate
 

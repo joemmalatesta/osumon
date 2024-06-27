@@ -6,7 +6,7 @@
 
 <div class="w screen h-screen flex justify-center items-center flex-col">
 	<h1 class="text-7xl my-2">{loading? "Loading..." : "osumon!"}</h1>
-	<form class="{loading ? 'hidden': ''} flex flex-col" on:submit|preventDefault={() => goto(`/v2/${username}`)}>
+	<form class="{loading ? 'hidden': ''} flex flex-col" on:submit|preventDefault={() => goto(`/v1/${username}`)}>
 		<input
 			class="border p-1 focus:outline-none focus:border-2 border-black rounded-t-md"
 			id="username"

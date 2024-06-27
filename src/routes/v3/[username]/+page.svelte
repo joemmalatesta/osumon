@@ -1,12 +1,17 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { setContext } from 'svelte';
 
 
 	export let data;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	$: playInfo = data?.topPlayInfo.slice(0,3)
+	$: playInfo = data?.topPlayInfo!.slice(0,3)
 	$: favMapper = data?.favoriteMapper
+	$: if (data.error) {
+		alert('User not found')
+		goto('/v3')
+	}
 
 	function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);

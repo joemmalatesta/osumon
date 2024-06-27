@@ -5,43 +5,49 @@ import { type sentrySvelteKit, startSpan } from '@sentry/sveltekit';
 // Load token in load function
 export const load: ServerLoad = async ({ params }) => {
 	// Need to be done first, before any subsequent calls
-	const token = await getAuthToken();
-	const username = params.username as string;
-	let userInfo: any = {};
-	const userProperties = [
-		'id',
-		'avatar_url',
-		'country_code',
-		'is_supporter',
-		'username',
-		'global_rank',
-		'playstyle',
-		'pp',
-		'join_date'
-	];
-	for (const property of userProperties) {
-		userInfo[property] = await getUserInfo(username, property, token);
+	try {
+		const token = await getAuthToken();
+		const username = params.username as string;
+		let userInfo: any = {};
+		const userProperties = [
+			'id',
+			'avatar_url',
+			'country_code',
+			'is_supporter',
+			'username',
+			'global_rank',
+			'playstyle',
+			'pp',
+			'join_date'
+		];
+		for (const property of userProperties) {
+			userInfo[property] = await getUserInfo(username, property, token);
+		}
+		const plays = await getTopPlays(token, userInfo['id']);
+
+		// Get deeper info on certain maps
+		let topPlayInfo = [];
+		for (let i = 0; i < 20; i++) {
+			topPlayInfo.push(await getMapInfo(token, plays[i]['beatmap']['id']));
+		}
+
+		const favoriteMapper = getFavoriteMapper(plays);
+
+		const { strength, weakness } = startSpan(
+			{ name: 'get strengths and weaknesses', op: 'function' },
+			() => getStrengthAndWeakness(plays)
+		);
+		return {
+			plays,
+			topPlayInfo,
+			favoriteMapper,
+			userInfo,
+			strength,
+			weakness
+		};
+	} catch (error) {
+		return { error: 'something wrong' };
 	}
-	const plays = await getTopPlays(token, userInfo['id'])
-
-	// Get deeper info on certain maps
-	let topPlayInfo = []
-	for (let i = 0; i < 20; i++) {
-		topPlayInfo.push(await getMapInfo(token, plays[i]['beatmap']['id']))
-	}
-
-
-	const favoriteMapper = getFavoriteMapper(plays)
-
-	const { strength, weakness } = startSpan({name: 'get strengths and weaknesses', op: "function"}, () => getStrengthAndWeakness(plays));
-	return {
-		plays,
-		topPlayInfo,
-		favoriteMapper,
-		userInfo,
-		strength,
-		weakness
-	};
 };
 // Get user info, all separate
 
@@ -108,7 +114,6 @@ function getStrengthAndWeakness(plays: any[]) {
 	};
 }
 
-
 async function getAuthToken() {
 	const url = new URL('https://osu.ppy.sh/oauth/token');
 
@@ -127,59 +132,51 @@ async function getAuthToken() {
 	return token;
 }
 
-async function getTopPlays(token: string, userId: string){
-	const response = await fetch(
-		`https://osu.ppy.sh/api/v2/users/${userId}/scores/best?limit=100`,
-		{
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization: `Bearer ${token}`
-			}
+async function getTopPlays(token: string, userId: string) {
+	const response = await fetch(`https://osu.ppy.sh/api/v2/users/${userId}/scores/best?limit=100`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			Accept: 'application/json',
+			Authorization: `Bearer ${token}`
 		}
-	);
+	});
 	return await response.json();
 }
-
 
 async function getMapInfo(token: string, mapId: string) {
-	const response = await fetch(
-		`https://osu.ppy.sh/api/v2/beatmaps/${mapId}`,
-		{
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization: `Bearer ${token}`
-			}
+	const response = await fetch(`https://osu.ppy.sh/api/v2/beatmaps/${mapId}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			Accept: 'application/json',
+			Authorization: `Bearer ${token}`
 		}
-	);
+	});
 	return await response.json();
 }
-
 
 function getFavoriteMapper(plays: any[]) {
 	const frequencyMap: { [key: string]: number } = {};
 
-    for (const play of plays) {
-		let mapper = play['beatmapset']['creator']
-        if (frequencyMap[mapper]) {
-            frequencyMap[mapper]++;
-        } else {
-            frequencyMap[mapper] = 1;
-        }
-    }
+	for (const play of plays) {
+		let mapper = play['beatmapset']['creator'];
+		if (frequencyMap[mapper]) {
+			frequencyMap[mapper]++;
+		} else {
+			frequencyMap[mapper] = 1;
+		}
+	}
 
-    let mostFrequentStr = "";
-    let maxCount = 0;
+	let mostFrequentStr = '';
+	let maxCount = 0;
 
-    for (const str in frequencyMap) {
-        if (frequencyMap[str] > maxCount) {
-            maxCount = frequencyMap[str];
-            mostFrequentStr = str;
-        }
-    }
-	console.log(mostFrequentStr)
-    return mostFrequentStr;
+	for (const str in frequencyMap) {
+		if (frequencyMap[str] > maxCount) {
+			maxCount = frequencyMap[str];
+			mostFrequentStr = str;
+		}
+	}
+	console.log(mostFrequentStr);
+	return mostFrequentStr;
 }

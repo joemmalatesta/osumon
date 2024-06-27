@@ -1,12 +1,15 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 
-	export let data
-	let userInfo;
-	let plays;
+	export let data;
 	$: plays = data?.plays;
 	$: userInfo = data?.userInfo;
-	$: console.log(userInfo)
-	$: console.log(data)
+	$: playInfo = data?.topPlayInfo!.slice(0,3)
+	$: favMapper = data?.favoriteMapper
+	$: if (data.error) {
+		alert('User not found')
+		goto('/v1')
+	}
 
 	function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -83,7 +86,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 				</div>
 				<!-- Top plays -->
 				<div class="h-1/3 flex flex-col px-10 mt-7 gap-3">
-					{#each plays.slice(0, 3) as play}
+					{#each plays.slice(0, 3) as play, index}
 						<div class="flex-col flex w-full">
 							<div class="flex items-start justify-between">
 								<div class="flex items-center">
@@ -103,7 +106,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 								{play['beatmap']['version']} - {play['beatmapset']['artist']}
 							</p>
 							<p class="opacity-60 text-xs">
-								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x, {(
+								{play['rank'] == 'SH' ? 'S' : play['rank']} rank, {play['max_combo']}x/{playInfo[index]['max_combo']}x, {(
 									play['accuracy'] * 100
 								).toFixed(2)}%
 							</p>
@@ -127,6 +130,7 @@ let possibleThemes = ['electric', 'dark', 'fire', 'water', 'psychic', 'grass']
 							<img class="w-6 h-4" src="/{data?.weakness}.png" alt="" />
 						</div>
 					</div>
+					<p class="italic text-sm">{favMapper} farmer</p>
 				</div>
 			</flex>
 		</section>
